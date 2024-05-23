@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"io/ioutil"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 
@@ -54,7 +54,10 @@ type AtlantisProject struct {
 	ApplyRequirements *[]string `json:"apply_requirements,omitempty"`
 
 	// Atlantis use ExecutionOrderGroup for sort projects before applying/planning
-	ExecutionOrderGroup int `json:"execution_order_group,omitempty"`
+	ExecutionOrderGroup *int `json:"execution_order_group,omitempty"`
+
+	// Atlantis uses DependsOn to define dependencies between projects
+	DependsOn []string `json:"depends_on,omitempty"`
 }
 
 // Autoplan settings for which plans affect other plans
@@ -70,7 +73,7 @@ type AutoplanConfig struct {
 // in to preserve some parts of the old config
 func readOldConfig() (*AtlantisConfig, error) {
 	// The old file not existing is not an error, as it should not exist on the very first run
-	bytes, err := ioutil.ReadFile(outputPath)
+	bytes, err := os.ReadFile(outputPath)
 	if err != nil {
 		log.Info("Could not find an old config file. Starting from scratch")
 		return nil, nil
